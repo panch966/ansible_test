@@ -1,0 +1,4 @@
+- name: add ssh key for user
+  authorized_key:
+    user: panch
+    key: "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDxWjffOvxQrbbT0lnSOTNNTeMe4bOc5V5d8QkXXI5fk ansible"
