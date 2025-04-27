@@ -4,18 +4,18 @@
   become: true
   pre_tasks:
 
-  - name: install updates (CentOS)
+  - name: update repo cache (CentOS)
     tags: always
     yum:
-      update_only: yes
       update_cache: yes
+    change_when: false
     when: ansible_distribution == "CentOS"
 
-  - name: install updates (Ubuntu)
+  - name: update repo cache (Ubuntu)
     tags: always
     apt:
-      upgrade: dist
       update_cache: yes
+    change_when: false
     when: ansible_distribution == "Ubuntu"
 
 - hosts: web_servers
@@ -37,6 +37,28 @@
         - php
       state: latest
     when: ansible_distribution == "CentOS"
+
+  - name: start httpd
+    service:
+      name: httpd
+      state: started
+      enabled: yes
+    when: ansible_distribution == "CentOS"
+
+  - name: change e-mail address for admin
+    tags: httpd
+    lineinfile:
+      path: /etc/httpd/conf/httpd.conf
+      regexp: '^ServerAdmin'
+      line: ServerAdmin test@mail.org
+    when: ansible_distribution == "CentOS"
+    register: httpd
+
+  - name: restart httpd
+    service:
+      name: httpd
+      state: restarted
+    when: httpd.changed
 
   - name: copy default html for site
     tags: apache,apache2,httpd
